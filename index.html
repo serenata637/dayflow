@@ -1,0 +1,2634 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAYFLOW</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #191719;
+    color: #E8DCCB;
+    font-family: Georgia, serif;
+    padding: 35px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #49302D;
+    padding-bottom: 25px;
+}
+
+.logo {
+    color: #A33B55;
+    font-size: 35px;
+    letter-spacing: 5px;
+}
+
+.tagline {
+    color: #B08A59;
+    margin-top: 7px;
+}
+
+.date {
+    color: #B08A59;
+    text-align: right;
+}
+
+main {
+    margin-top: 40px;
+}
+
+.welcome {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.description {
+    color: #B08A59;
+    margin-bottom: 30px;
+}
+
+.clock {
+    background: #2A2023;
+    border: 1px solid #681F35;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.clock h2 {
+    color: #B08A59;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+#time {
+    font-size: 38px;
+}
+
+.sections {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: #241E20;
+    border: 1px solid #49302D;
+    border-radius: 15px;
+    padding: 25px;
+    min-width: 0;
+}
+
+.card h3 {
+    color: #A33B55;
+    margin-bottom: 15px;
+}
+
+.card p {
+    color: #B8A99A;
+}
+
+.calendar-card,
+.weekly-card,
+.goals-card,
+.journal-card {
+    grid-column: span 2;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.calendar-header button {
+    background: #681F35;
+    color: #E8DCCB;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.calendar-header h4 {
+    color: #B08A59;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 7px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.calendar-grid div {
+    padding: 12px 3px;
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+.day-name {
+    color: #B08A59;
+    font-weight: bold;
+}
+
+.day {
+    background: #302529;
+    cursor: pointer;
+    position: relative;
+}
+
+.day:hover {
+    background: #681F35;
+}
+
+.day.selected {
+    background: #8D304B;
+    color: white;
+}
+
+.day.today {
+    border: 1px solid #B08A59;
+}
+
+.day.has-tasks::after {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 5px;
+    background: #D4A45D;
+    border-radius: 50%;
+    margin: 4px auto 0;
+}
+
+.day.has-events {
+    box-shadow: inset 0 -2px 0 #B08A59;
+}
+
+.empty {
+    background: transparent;
+}
+
+#selectedDate {
+    color: #B08A59;
+    margin-top: 15px;
+}
+
+/* GENERAL INPUTS AND BUTTONS */
+
+input, select, textarea, button {
+    font-family: Georgia, serif;
+}
+
+input, select, textarea {
+    background: #302529;
+    color: #E8DCCB;
+    border: 1px solid #49302D;
+    border-radius: 7px;
+    padding: 11px;
+}
+
+input[type="date"] {
+    color-scheme: dark;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* TASKS */
+
+.task-input,
+.task-filters,
+.edit-fields,
+.edit-actions,
+.task-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.task-input {
+    margin: 18px 0;
+}
+
+.task-input input {
+    flex: 1;
+    min-width: 100px;
+}
+
+.task-input button,
+.event-form button,
+.goal-form button,
+.journal-form button {
+    background: #681F35;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 16px;
+}
+
+.task-filters {
+    margin-bottom: 12px;
+}
+
+.task-filters select {
+    flex: 1;
+    min-width: 100px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 0;
+    border-bottom: 1px solid #49302D;
+    list-style: none;
+}
+
+.task-item input[type="checkbox"] {
+    accent-color: #A33B55;
+    width: 17px;
+    height: 17px;
+}
+
+.task-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-name {
+    overflow-wrap: anywhere;
+}
+
+.completed .task-name {
+    text-decoration: line-through;
+    color: #82756E;
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 5px;
+}
+
+.category-tag,
+.priority {
+    color: #B08A59;
+    font-size: 11px;
+}
+
+.edit-btn,
+.delete-btn,
+.goal-delete,
+.event-delete {
+    background: transparent;
+    border: none;
+}
+
+.edit-btn {
+    color: #B08A59;
+    font-size: 12px;
+}
+
+.delete-btn,
+.event-delete,
+.goal-delete {
+    color: #A33B55;
+    font-size: 20px;
+}
+
+.edit-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.edit-fields input {
+    flex: 1 1 130px;
+}
+
+.edit-actions button {
+    background: #681F35;
+    color: #E8DCCB;
+    border: 1px solid #8D304B;
+    border-radius: 7px;
+    padding: 8px 12px;
+}
+
+.edit-actions .cancel-edit {
+    background: #49302D;
+}
+
+.task-empty,
+.event-empty,
+.goal-empty,
+.journal-empty,
+.week-empty {
+    color: #82756E;
+    font-size: 13px;
+    padding: 12px 0;
+}
+
+#taskCount {
+    color: #B08A59;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+/* FOCUS TIMER */
+
+.focus-timer {
+    margin-top: 18px;
+    padding: 18px;
+    background: #302529;
+    border: 1px solid #49302D;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.timer-modes,
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.timer-modes {
+    margin-bottom: 18px;
+}
+
+.timer-modes button,
+.timer-controls button {
+    background: #49302D;
+    color: #E8DCCB;
+    border: 1px solid #681F35;
+    border-radius: 7px;
+    padding: 9px 13px;
+}
+
+.timer-modes button.active,
+.timer-controls button.primary {
+    background: #681F35;
+}
+
+#timerDisplay {
+    color: #E8DCCB;
+    font-size: clamp(42px, 8vw, 58px);
+    letter-spacing: 2px;
+    margin: 12px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+#timerStatus {
+    color: #B08A59;
+    min-height: 20px;
+    margin-bottom: 16px;
+}
+
+/* DAILY PROGRESS */
+
+.progress-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0 10px;
+}
+
+#progressPercent {
+    color: #B08A59;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+#progressCounts {
+    color: #B8A99A;
+    font-size: 12px;
+}
+
+.progress-track,
+.weekly-progress-track,
+.goal-overall-track,
+.goal-progress-track {
+    width: 100%;
+    height: 11px;
+    background: #49302D;
+    border: 1px solid #681F35;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill,
+#weeklyProgressFill,
+#goalOverallFill,
+.goal-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #681F35, #B08A59);
+    border-radius: 20px;
+    transition: width 0.35s ease;
+}
+
+.progress-message {
+    margin-top: 13px;
+    font-size: 13px;
+    color: #B08A59 !important;
+}
+
+/* EVENTS */
+
+.event-form,
+.goal-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+}
+
+.event-form input[type="text"] {
+    flex: 1 1 140px;
+}
+
+.event-form input[type="date"] {
+    flex: 1 1 130px;
+}
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #49302D;
+}
+
+.event-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-title {
+    color: #E8DCCB;
+    overflow-wrap: anywhere;
+}
+
+.event-meta,
+.event-category {
+    color: #B08A59;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.notification-settings {
+    background: #302529;
+    border: 1px solid #49302D;
+    border-radius: 9px;
+    padding: 12px;
+    margin: 12px 0 18px;
+}
+
+.notification-settings button {
+    background: #681F35;
+    color: #E8DCCB;
+    border: 1px solid #8D304B;
+    border-radius: 7px;
+    padding: 9px 12px;
+}
+
+.notification-settings p {
+    color: #B8A99A;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 8px;
+}
+
+/* WEEKLY OVERVIEW */
+
+.week-range {
+    color: #B08A59;
+    font-size: 13px;
+    margin: -5px 0 18px;
+}
+
+.week-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.week-stat {
+    background: #302529;
+    border: 1px solid #49302D;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.week-stat strong {
+    display: block;
+    color: #E8DCCB;
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+.week-stat span {
+    color: #B08A59;
+    font-size: 12px;
+}
+
+#weeklyProgressText {
+    color: #B08A59;
+    font-size: 12px;
+    margin: 9px 0 20px;
+}
+
+.weekly-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.week-day {
+    background: #302529;
+    border: 1px solid #49302D;
+    border-radius: 9px;
+    padding: 12px 6px;
+    color: #E8DCCB;
+    text-align: center;
+    cursor: pointer;
+}
+
+.week-day:hover {
+    background: #49302D;
+    border-color: #B08A59;
+}
+
+.week-day.selected {
+    background: #681F35;
+    border-color: #A33B55;
+}
+
+.week-day.today {
+    box-shadow: inset 0 0 0 1px #B08A59;
+}
+
+.week-day-name,
+.week-day-number,
+.week-day-count {
+    display: block;
+}
+
+.week-day-name {
+    color: #B08A59;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.week-day-number {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.week-day-count {
+    color: #B8A99A;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.week-events-heading {
+    color: #A33B55;
+    font-size: 15px;
+    margin: 22px 0 10px;
+}
+
+.week-event-list {
+    list-style: none;
+}
+
+.week-event {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #49302D;
+    cursor: pointer;
+}
+
+.week-event-info {
+    min-width: 0;
+}
+
+.week-event-name {
+    color: #E8DCCB;
+}
+
+.week-event-date,
+.week-event-category {
+    color: #B08A59;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+/* GOALS */
+
+.goals-intro,
+.journal-intro {
+    color: #B8A99A;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: -5px 0 18px;
+}
+
+.goal-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    color: #B08A59;
+    font-size: 12px;
+    margin: 12px 0 8px;
+}
+
+.goal-form input[type="text"] {
+    flex: 1 1 180px;
+}
+
+.goal-form input[type="date"] {
+    flex: 1 1 140px;
+}
+
+.goal-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.goal-item {
+    background: #302529;
+    border: 1px solid #49302D;
+    border-radius: 11px;
+    padding: 15px;
+    min-width: 0;
+}
+
+.goal-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.goal-title {
+    color: #E8DCCB;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+}
+
+.goal-meta {
+    color: #B08A59;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.goal-progress-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: #D4A45D;
+    font-size: 11px;
+    margin: 12px 0 7px;
+}
+
+.goal-slider {
+    width: 100%;
+    accent-color: #A33B55;
+    cursor: pointer;
+}
+
+/* NOTES & JOURNAL */
+
+.journal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 18px 0 22px;
+}
+
+.journal-form input,
+.journal-form textarea {
+    width: 100%;
+    font-size: 13px;
+}
+
+.journal-form textarea {
+    min-height: 115px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.journal-form button {
+    align-self: flex-start;
+}
+
+.journal-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.journal-entry {
+    background: #302529;
+    border: 1px solid #49302D;
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 0;
+}
+
+.journal-entry-title {
+    color: #E8DCCB;
+    font-size: 15px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.journal-entry-date {
+    color: #B08A59;
+    font-size: 11px;
+    margin: 6px 0 10px;
+}
+
+.journal-entry-content {
+    color: #B8A99A;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.journal-actions,
+.journal-edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 13px;
+}
+
+.journal-actions button,
+.journal-edit-actions button {
+    background: #681F35;
+    color: #E8DCCB;
+    border: 1px solid #8D304B;
+    border-radius: 7px;
+    padding: 8px 12px;
+}
+
+.journal-actions .journal-delete,
+.journal-edit-actions .journal-cancel {
+    background: #49302D;
+}
+
+.journal-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.journal-edit-form input,
+.journal-edit-form textarea {
+    width: 100%;
+    background: #241E20;
+}
+
+.journal-edit-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 18px;
+    }
+
+    .logo {
+        font-size: 25px;
+    }
+
+    .sections {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-card,
+    .weekly-card,
+    .goals-card,
+    .journal-card {
+        grid-column: span 1;
+    }
+
+    .weekly-days {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .goal-list,
+    .journal-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .calendar-grid {
+        gap: 3px;
+    }
+
+    .calendar-grid div {
+        padding: 9px 1px;
+        font-size: 11px;
+    }
+
+    .week-summary {
+        gap: 6px;
+    }
+
+    .week-stat {
+        padding: 11px 5px;
+    }
+
+    .week-stat strong {
+        font-size: 21px;
+    }
+
+    .week-stat span {
+        font-size: 10px;
+    }
+
+    .weekly-days {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .task-item {
+        flex-wrap: wrap;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1 class="logo">DAYFLOW</h1>
+        <p class="tagline">Plan your day. Own your time.</p>
+    </div>
+
+    <div class="date">
+        <p id="today"></p>
+    </div>
+</header>
+
+<main>
+
+    <h2 class="welcome">Welcome Back!</h2>
+    <p class="description">A fresh day, a fresh start. Make it count.</p>
+
+    <section class="clock">
+        <h2>YOUR LOCAL TIME</h2>
+        <p id="time">00:00:00</p>
+    </section>
+
+    <section class="sections">
+
+        <div class="card calendar-card">
+            <h3>My Calendar</h3>
+
+            <div class="calendar-header">
+                <button onclick="changeMonth(-1)">❮</button>
+                <h4 id="monthYear"></h4>
+                <button onclick="changeMonth(1)">❯</button>
+            </div>
+
+            <div class="calendar-grid" id="calendar"></div>
+            <p id="selectedDate">Select a date</p>
+        </div>
+
+        <div class="card weekly-card">
+            <h3>Weekly Overview</h3>
+            <p id="weekRange" class="week-range">Your week at a glance.</p>
+
+            <div class="week-summary">
+                <div class="week-stat">
+                    <strong id="weekTotal">0</strong>
+                    <span>Total Tasks</span>
+                </div>
+                <div class="week-stat">
+                    <strong id="weekCompleted">0</strong>
+                    <span>Completed</span>
+                </div>
+                <div class="week-stat">
+                    <strong id="weekEvents">0</strong>
+                    <span>Events</span>
+                </div>
+            </div>
+
+            <div class="weekly-progress-track" id="weeklyProgressTrack"
+                 role="progressbar" aria-label="Weekly task progress"
+                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="weeklyProgressFill"></div>
+            </div>
+
+            <p id="weeklyProgressText">0% of this week's tasks completed</p>
+            <div id="weeklyDays" class="weekly-days"></div>
+
+            <h4 class="week-events-heading">Events This Week</h4>
+            <ul id="weeklyEventList" class="week-event-list"></ul>
+        </div>
+
+        <div class="card goals-card">
+            <h3>My Goals</h3>
+            <p class="goals-intro">
+                Keep your bigger plans in sight. Update each goal as you make progress.
+            </p>
+
+            <div class="goal-summary">
+                <span id="goalCount">0 goals</span>
+                <span id="goalAverage">0% average progress</span>
+            </div>
+
+            <div class="goal-overall-track" id="goalOverallTrack"
+                 role="progressbar" aria-label="Overall goals progress"
+                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="goalOverallFill"></div>
+            </div>
+
+            <div class="goal-form">
+                <input type="text" id="goalInput"
+                       placeholder="What's your goal?" maxlength="80">
+
+                <select id="goalCategoryInput">
+                    <option value="Personal">Personal</option>
+                    <option value="Study">Study</option>
+                    <option value="Skill">Skill</option>
+                    <option value="Project">Project</option>
+                </select>
+
+                <input type="date" id="goalDateInput" title="Target date (optional)">
+                <button type="button" onclick="addGoal()">Add Goal</button>
+            </div>
+
+            <div id="goalList" class="goal-list"></div>
+        </div>
+
+        <div class="card journal-card">
+            <h3>Notes &amp; Journal</h3>
+            <p class="journal-intro">
+                Save your thoughts, ideas, and little moments. Your entries stay in DAYFLOW.
+            </p>
+
+            <div class="journal-form">
+                <input type="text" id="journalTitleInput"
+                       placeholder="Give your note a title..." maxlength="100">
+
+                <input type="date" id="journalDateInput">
+
+                <textarea id="journalContentInput"
+                          placeholder="Write something..."
+                          maxlength="5000"></textarea>
+
+                <button type="button" onclick="addJournalEntry()">Save Note</button>
+            </div>
+
+            <div id="journalList" class="journal-list"></div>
+        </div>
+
+        <div class="card">
+            <h3>Today's Tasks</h3>
+            <p id="taskDate"></p>
+
+            <div class="task-input">
+                <input type="text" id="taskInput" placeholder="Write a new task...">
+
+                <select id="priorityInput">
+                    <option value="High">High</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <select id="categoryInput">
+                    <option value="Study">Study</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Project">Project</option>
+                    <option value="Other" selected>Other</option>
+                </select>
+
+                <button onclick="addTask()">Add</button>
+            </div>
+
+            <div class="task-filters">
+                <select id="categoryFilter" onchange="renderTasks()">
+                    <option value="All">All Categories</option>
+                    <option value="Study">Study</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Project">Project</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <select id="priorityFilter" onchange="renderTasks()">
+                    <option value="All">All Priorities</option>
+                    <option value="High">High Priority</option>
+                    <option value="Medium">Medium Priority</option>
+                    <option value="Low">Low Priority</option>
+                </select>
+            </div>
+
+            <ul id="taskList"></ul>
+            <p id="taskCount">0 tasks remaining</p>
+        </div>
+
+        <div class="card">
+            <h3>Upcoming Events</h3>
+            <p id="eventDateLabel">Events for your selected date.</p>
+
+            <div class="event-form">
+                <input type="text" id="eventInput" placeholder="Event name...">
+                <input type="date" id="eventDateInput">
+
+                <select id="eventCategoryInput">
+                    <option value="Personal">Personal</option>
+                    <option value="School">School</option>
+                    <option value="Birthday">Birthday</option>
+                    <option value="Project">Project</option>
+                </select>
+
+                <select id="eventReminderInput">
+                    <option value="none">No reminder</option>
+                    <option value="same-day">On the day</option>
+                    <option value="day-before">1 day before</option>
+                </select>
+
+                <button onclick="addEvent()">Add Event</button>
+            </div>
+
+            <div class="notification-settings">
+                <button id="notificationButton" onclick="enableNotifications()">
+                    Enable Notifications
+                </button>
+
+                <p id="notificationStatus" aria-live="polite">
+                    Turn on browser notifications to receive reminders while DAYFLOW is open.
+                </p>
+            </div>
+
+            <ul id="eventList"></ul>
+        </div>
+
+        <div class="card">
+            <h3>Focus Timer</h3>
+            <p>Stay focused and manage your time.</p>
+
+            <div class="focus-timer">
+                <div class="timer-modes">
+                    <button id="focusMode" class="active"
+                            onclick="setTimerMode('focus')">Focus</button>
+                    <button id="breakMode"
+                            onclick="setTimerMode('break')">Short Break</button>
+                </div>
+
+                <p id="timerDisplay">25:00</p>
+                <p id="timerStatus">Ready when you are.</p>
+
+                <div class="timer-controls">
+                    <button id="startPauseButton" class="primary"
+                            onclick="startPauseTimer()">Start</button>
+                    <button onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Daily Progress</h3>
+            <p id="progressDate">Your progress for today.</p>
+
+            <div class="progress-summary">
+                <span id="progressPercent">0%</span>
+                <span id="progressCounts">0 of 0 tasks completed</span>
+            </div>
+
+            <div class="progress-track" role="progressbar"
+                 aria-label="Daily task progress"
+                 aria-valuemin="0" aria-valuemax="100"
+                 aria-valuenow="0" id="progressTrack">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+
+            <p id="progressMessage" class="progress-message">
+                Add a task to get started.
+            </p>
+        </div>
+
+    </section>
+</main>
+
+<script>
+
+// CLOCK
+
+function updateClock() {
+    const now = new Date();
+
+    document.getElementById("time").textContent =
+        now.toLocaleTimeString("en-GB");
+
+    document.getElementById("today").textContent =
+        now.toLocaleDateString("en-GB", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+
+// DATE HELPERS
+
+function dateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+function formatDate(date) {
+    return date.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+    });
+}
+
+function getStartOfWeek(date) {
+    const start = new Date(date);
+    const dayOffset = (start.getDay() + 6) % 7;
+
+    start.setDate(start.getDate() - dayOffset);
+    start.setHours(12, 0, 0, 0);
+
+    return start;
+}
+
+
+// DATA STORAGE
+
+function loadData(key) {
+    try {
+        const saved = JSON.parse(localStorage.getItem(key));
+        return saved && typeof saved === "object" ? saved : {};
+    } catch {
+        return {};
+    }
+}
+
+function loadArray(key) {
+    try {
+        const saved = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(saved) ? saved : [];
+    } catch {
+        return [];
+    }
+}
+
+
+// TASK AND EVENT DATA
+
+let tasks = loadData("dayflowTasks");
+let events = loadData("dayflowEvents");
+
+
+// CALENDAR
+
+let currentDate = new Date();
+let selectedDate = new Date();
+
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const monthNames = [
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+    ];
+
+    document.getElementById("monthYear").textContent =
+        monthNames[month] + " " + year;
+
+    const calendar = document.getElementById("calendar");
+    calendar.innerHTML = "";
+
+    const weekDays = [
+        "Sun", "Mon", "Tue", "Wed",
+        "Thu", "Fri", "Sat"
+    ];
+
+    weekDays.forEach(day => {
+        const div = document.createElement("div");
+        div.textContent = day;
+        div.className = "day-name";
+        calendar.appendChild(div);
+    });
+
+    const firstDay =
+        new Date(year, month, 1).getDay();
+
+    const daysInMonth =
+        new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        calendar.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const div = document.createElement("div");
+
+        div.textContent = day;
+        div.className = "day";
+
+        const thisDate = new Date(year, month, day);
+        const key = dateKey(thisDate);
+
+        if (key === dateKey(new Date())) {
+            div.classList.add("today");
+        }
+
+        if (key === dateKey(selectedDate)) {
+            div.classList.add("selected");
+        }
+
+        if (tasks[key] && tasks[key].length > 0) {
+            div.classList.add("has-tasks");
+        }
+
+        if (events[key] && events[key].length > 0) {
+            div.classList.add("has-events");
+        }
+
+        div.onclick = function() {
+            selectedDate = thisDate;
+
+            updateSelectedDate();
+            renderCalendar();
+            renderTasks();
+            renderEvents();
+            renderWeeklyOverview();
+        };
+
+        calendar.appendChild(div);
+    }
+}
+
+function changeMonth(amount) {
+    currentDate.setDate(1);
+    currentDate.setMonth(currentDate.getMonth() + amount);
+
+    renderCalendar();
+}
+
+
+// SELECTED DATE
+
+function updateSelectedDate() {
+    const key = dateKey(selectedDate);
+
+    document.getElementById("selectedDate").textContent =
+        "Selected: " + formatDate(selectedDate);
+
+    document.getElementById("taskDate").textContent =
+        "Tasks for " + formatDate(selectedDate);
+
+    document.getElementById("eventDateLabel").textContent =
+        "Events for " + formatDate(selectedDate);
+}
+
+
+// SAVE TASKS
+
+function saveTasks() {
+    localStorage.setItem("dayflowTasks", JSON.stringify(tasks));
+}
+
+
+// ADD TASK
+
+function addTask() {
+    const input = document.getElementById("taskInput");
+    const priority = document.getElementById("priorityInput");
+    const category = document.getElementById("categoryInput");
+
+    const taskName = input.value.trim();
+
+    if (taskName === "") {
+        alert("Please write a task first!");
+        input.focus();
+        return;
+    }
+
+    const key = dateKey(selectedDate);
+
+    if (!tasks[key]) {
+        tasks[key] = [];
+    }
+
+    tasks[key].push({
+        id: Date.now(),
+        name: taskName,
+        priority: priority.value,
+        category: category.value,
+        completed: false
+    });
+
+    saveTasks();
+    renderTasks();
+    renderCalendar();
+
+    input.value = "";
+    input.focus();
+}
+
+
+// EDIT TASK
+
+function editTask(id) {
+    const key = dateKey(selectedDate);
+    const task = (tasks[key] || []).find(item => item.id === id);
+
+    if (!task) return;
+
+    const listItem = document.getElementById("task-" + id);
+    if (!listItem) return;
+
+    listItem.innerHTML = "";
+
+    const form = document.createElement("div");
+    form.className = "edit-form";
+
+    const fields = document.createElement("div");
+    fields.className = "edit-fields";
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.value = task.name;
+    nameInput.setAttribute("aria-label", "Task name");
+
+    const prioritySelect = document.createElement("select");
+
+    ["High", "Medium", "Low"].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        prioritySelect.appendChild(option);
+    });
+
+    prioritySelect.value = task.priority || "Medium";
+
+    const categorySelect = document.createElement("select");
+
+    ["Study", "Personal", "Project", "Other"].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        categorySelect.appendChild(option);
+    });
+
+    categorySelect.value = task.category || "Other";
+
+    fields.appendChild(nameInput);
+    fields.appendChild(prioritySelect);
+    fields.appendChild(categorySelect);
+
+    const actions = document.createElement("div");
+    actions.className = "edit-actions";
+
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "Save";
+
+    saveButton.onclick = function() {
+        const newName = nameInput.value.trim();
+
+        if (newName === "") {
+            alert("Task name cannot be empty.");
+            nameInput.focus();
+            return;
+        }
+
+        task.name = newName;
+        task.priority = prioritySelect.value;
+        task.category = categorySelect.value;
+
+        saveTasks();
+        renderTasks();
+    };
+
+    const cancelButton = document.createElement("button");
+    cancelButton.textContent = "Cancel";
+    cancelButton.className = "cancel-edit";
+    cancelButton.onclick = renderTasks;
+
+    nameInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") saveButton.click();
+        if (event.key === "Escape") renderTasks();
+    });
+
+    actions.appendChild(saveButton);
+    actions.appendChild(cancelButton);
+
+    form.appendChild(fields);
+    form.appendChild(actions);
+    listItem.appendChild(form);
+
+    nameInput.focus();
+    nameInput.select();
+}
+
+
+// COMPLETE TASK
+
+function toggleTask(id) {
+    const key = dateKey(selectedDate);
+
+    tasks[key] = (tasks[key] || []).map(task => {
+        if (task.id === id) {
+            task.completed = !task.completed;
+        }
+
+        return task;
+    });
+
+    saveTasks();
+    renderTasks();
+}
+
+
+// DELETE TASK
+
+function deleteTask(id) {
+    const key = dateKey(selectedDate);
+
+    tasks[key] = (tasks[key] || []).filter(
+        task => task.id !== id
+    );
+
+    saveTasks();
+    renderTasks();
+    renderCalendar();
+}
+
+
+// DAILY PROGRESS
+
+function updateProgress() {
+    const key = dateKey(selectedDate);
+    const dailyTasks = tasks[key] || [];
+
+    const total = dailyTasks.length;
+
+    const completed = dailyTasks.filter(
+        task => task.completed
+    ).length;
+
+    const percentage = total === 0
+        ? 0
+        : Math.round((completed / total) * 100);
+
+    document.getElementById("progressDate").textContent =
+        "Progress for " + formatDate(selectedDate);
+
+    document.getElementById("progressPercent").textContent =
+        percentage + "%";
+
+    document.getElementById("progressCounts").textContent =
+        completed + " of " + total + " tasks completed";
+
+    document.getElementById("progressFill").style.width =
+        percentage + "%";
+
+    document.getElementById("progressTrack").setAttribute(
+        "aria-valuenow",
+        percentage
+    );
+
+    let message = "Add a task to get started.";
+
+    if (total > 0 && percentage === 100) {
+        message = "Everything is done. Amazing work!";
+    } else if (percentage >= 70) {
+        message = "You're almost there. Keep it up!";
+    } else if (percentage > 0) {
+        message = "Great start. One step at a time.";
+    } else if (total > 0) {
+        message = "Your tasks are ready. Let's begin!";
+    }
+
+    document.getElementById("progressMessage").textContent = message;
+}
+
+
+// SHOW TASKS
+
+function renderTasks() {
+    const key = dateKey(selectedDate);
+    const list = document.getElementById("taskList");
+
+    list.innerHTML = "";
+
+    const dailyTasks = tasks[key] || [];
+
+    const categoryFilter = document.getElementById("categoryFilter").value;
+    const priorityFilter = document.getElementById("priorityFilter").value;
+
+    const visibleTasks = dailyTasks.filter(task => {
+        const taskCategory = task.category || "Other";
+
+        const categoryMatches =
+            categoryFilter === "All" || taskCategory === categoryFilter;
+
+        const priorityMatches =
+            priorityFilter === "All" || task.priority === priorityFilter;
+
+        return categoryMatches && priorityMatches;
+    });
+
+    if (visibleTasks.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "task-empty";
+        empty.textContent = dailyTasks.length === 0
+            ? "No tasks yet. Add your first task!"
+            : "No tasks match these filters.";
+
+        list.appendChild(empty);
+    }
+
+    visibleTasks.forEach(task => {
+        if (!task.category) task.category = "Other";
+
+        const li = document.createElement("li");
+        li.className = "task-item";
+        li.id = "task-" + task.id;
+
+        if (task.completed) {
+            li.classList.add("completed");
+        }
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+        checkbox.setAttribute("aria-label", "Mark task complete");
+
+        checkbox.onchange = function() {
+            toggleTask(task.id);
+        };
+
+        const info = document.createElement("div");
+        info.className = "task-info";
+
+        const name = document.createElement("span");
+        name.className = "task-name";
+        name.textContent = task.name;
+
+        const meta = document.createElement("div");
+        meta.className = "task-meta";
+
+        const category = document.createElement("span");
+        category.className = "category-tag";
+        category.textContent = task.category;
+
+        const priority = document.createElement("span");
+        priority.className = "priority";
+        priority.textContent = task.priority;
+
+        meta.appendChild(category);
+        meta.appendChild(priority);
+        info.appendChild(name);
+        info.appendChild(meta);
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        const editButton = document.createElement("button");
+        editButton.className = "edit-btn";
+        editButton.textContent = "Edit";
+
+        editButton.onclick = function() {
+            editTask(task.id);
+        };
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-btn";
+        deleteButton.textContent = "×";
+
+        deleteButton.onclick = function() {
+            deleteTask(task.id);
+        };
+
+        actions.appendChild(editButton);
+        actions.appendChild(deleteButton);
+
+        li.appendChild(checkbox);
+        li.appendChild(info);
+        li.appendChild(actions);
+
+        list.appendChild(li);
+    });
+
+    const remaining = dailyTasks.filter(
+        task => !task.completed
+    ).length;
+
+    document.getElementById("taskCount").textContent =
+        remaining + " tasks remaining";
+
+    updateProgress();
+    renderWeeklyOverview();
+}
+
+
+// EVENTS
+
+function saveEvents() {
+    localStorage.setItem("dayflowEvents", JSON.stringify(events));
+}
+
+function addEvent() {
+    const input = document.getElementById("eventInput");
+    const name = input.value.trim();
+    const eventDate = document.getElementById("eventDateInput").value;
+    const category = document.getElementById("eventCategoryInput").value;
+    const reminder = document.getElementById("eventReminderInput").value;
+
+    if (!name) {
+        alert("Please write an event name.");
+        input.focus();
+        return;
+    }
+
+    if (!eventDate) {
+        alert("Please choose an event date.");
+        return;
+    }
+
+    if (!events[eventDate]) {
+        events[eventDate] = [];
+    }
+
+    events[eventDate].push({
+        id: Date.now(),
+        name: name,
+        category: category,
+        reminder: reminder
+    });
+
+    saveEvents();
+
+    input.value = "";
+    renderEvents();
+    renderCalendar();
+    renderWeeklyOverview();
+}
+
+function deleteEvent(id) {
+    const key = dateKey(selectedDate);
+
+    events[key] = (events[key] || []).filter(
+        event => event.id !== id
+    );
+
+    saveEvents();
+    renderEvents();
+    renderCalendar();
+    renderWeeklyOverview();
+}
+
+function renderEvents() {
+    const key = dateKey(selectedDate);
+    const list = document.getElementById("eventList");
+
+    list.innerHTML = "";
+
+    const dailyEvents = events[key] || [];
+
+    if (dailyEvents.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "event-empty";
+        empty.textContent = "No events for this date.";
+        list.appendChild(empty);
+        return;
+    }
+
+    dailyEvents.forEach(event => {
+        const item = document.createElement("li");
+        item.className = "event-item";
+
+        const details = document.createElement("div");
+        details.className = "event-details";
+
+        const title = document.createElement("p");
+        title.className = "event-title";
+        title.textContent = event.name;
+
+        const meta = document.createElement("p");
+        meta.className = "event-meta";
+        meta.textContent =
+            (event.category || "Personal") +
+            " · Reminder: " +
+            reminderLabel(event.reminder);
+
+        details.appendChild(title);
+        details.appendChild(meta);
+
+        const remove = document.createElement("button");
+        remove.className = "event-delete";
+        remove.textContent = "×";
+        remove.setAttribute("aria-label", "Delete event");
+
+        remove.onclick = function() {
+            deleteEvent(event.id);
+        };
+
+        item.appendChild(details);
+        item.appendChild(remove);
+
+        list.appendChild(item);
+    });
+}
+
+function reminderLabel(value) {
+    if (value === "same-day") return "On the day";
+    if (value === "day-before") return "1 day before";
+    return "None";
+}
+
+
+// NOTIFICATIONS
+
+let sentReminders = loadArray("dayflowSentReminders");
+
+function saveSentReminders() {
+    localStorage.setItem(
+        "dayflowSentReminders",
+        JSON.stringify(sentReminders)
+    );
+}
+
+function refreshNotificationButton() {
+    const button = document.getElementById("notificationButton");
+    const status = document.getElementById("notificationStatus");
+
+    if (!("Notification" in window)) {
+        button.disabled = true;
+        status.textContent = "This browser does not support notifications.";
+        return;
+    }
+
+    if (Notification.permission === "granted") {
+        button.textContent = "Notifications Enabled";
+        button.disabled = true;
+        status.textContent = "Notifications are enabled.";
+    } else if (Notification.permission === "denied") {
+        button.textContent = "Notifications Blocked";
+        button.disabled = true;
+        status.textContent =
+            "Notifications are blocked in your browser settings.";
+    } else {
+        button.textContent = "Enable Notifications";
+        button.disabled = false;
+        status.textContent =
+            "Turn on browser notifications to receive reminders while DAYFLOW is open.";
+    }
+}
+
+async function enableNotifications() {
+    if (!("Notification" in window)) {
+        alert("Your browser does not support notifications.");
+        return;
+    }
+
+    try {
+        const permission = await Notification.requestPermission();
+
+        refreshNotificationButton();
+
+        if (permission === "granted") {
+            checkEventReminders();
+        }
+    } catch (error) {
+        console.error("Notification permission error:", error);
+    }
+}
+
+function checkEventReminders() {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+
+    const now = new Date();
+    const todayKey = dateKey(now);
+
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowKey = dateKey(tomorrow);
+
+    Object.keys(events).forEach(eventDate => {
+        (events[eventDate] || []).forEach(event => {
+            let shouldNotify = false;
+
+            if (event.reminder === "same-day" && eventDate === todayKey) {
+                shouldNotify = true;
+            }
+
+            if (event.reminder === "day-before" && eventDate === tomorrowKey) {
+                shouldNotify = true;
+            }
+
+            const reminderId = event.id + "-" + event.reminder;
+
+            if (shouldNotify && !sentReminders.includes(reminderId)) {
+                new Notification("DAYFLOW Reminder", {
+                    body: event.name + " · " + eventDate
+                });
+
+                sentReminders.push(reminderId);
+                saveSentReminders();
+            }
+        });
+    });
+}
+
+
+// WEEKLY OVERVIEW
+
+function renderWeeklyOverview() {
+    const start = getStartOfWeek(selectedDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+
+    document.getElementById("weekRange").textContent =
+        formatDate(start) + " – " + formatDate(end);
+
+    let totalTasks = 0;
+    let completedTasks = 0;
+    let totalEvents = 0;
+
+    const daysContainer = document.getElementById("weeklyDays");
+    daysContainer.innerHTML = "";
+
+    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    for (let i = 0; i < 7; i++) {
+        const day = new Date(start);
+        day.setDate(start.getDate() + i);
+
+        const key = dateKey(day);
+        const dayTasks = tasks[key] || [];
+        const dayEvents = events[key] || [];
+
+        const completed = dayTasks.filter(task => task.completed).length;
+
+        totalTasks += dayTasks.length;
+        completedTasks += completed;
+        totalEvents += dayEvents.length;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "week-day";
+
+        if (key === dateKey(selectedDate)) {
+            button.classList.add("selected");
+        }
+
+        if (key === dateKey(new Date())) {
+            button.classList.add("today");
+        }
+
+        const name = document.createElement("span");
+        name.className = "week-day-name";
+        name.textContent = dayNames[i];
+
+        const number = document.createElement("span");
+        number.className = "week-day-number";
+        number.textContent = day.getDate();
+
+        const count = document.createElement("span");
+        count.className = "week-day-count";
+        count.textContent = completed + "/" + dayTasks.length + " done";
+
+        button.appendChild(name);
+        button.appendChild(number);
+        button.appendChild(count);
+
+        button.onclick = function() {
+            selectedDate = new Date(day);
+            updateSelectedDate();
+            renderCalendar();
+            renderTasks();
+            renderEvents();
+            renderWeeklyOverview();
+        };
+
+        daysContainer.appendChild(button);
+    }
+
+    const percentage = totalTasks === 0
+        ? 0
+        : Math.round((completedTasks / totalTasks) * 100);
+
+    document.getElementById("weekTotal").textContent = totalTasks;
+    document.getElementById("weekCompleted").textContent = completedTasks;
+    document.getElementById("weekEvents").textContent = totalEvents;
+
+    document.getElementById("weeklyProgressFill").style.width =
+        percentage + "%";
+
+    document.getElementById("weeklyProgressTrack").setAttribute(
+        "aria-valuenow",
+        percentage
+    );
+
+    document.getElementById("weeklyProgressText").textContent =
+        percentage + "% of this week's tasks completed";
+
+    const eventList = document.getElementById("weeklyEventList");
+    eventList.innerHTML = "";
+
+    let foundEvents = false;
+
+    for (let i = 0; i < 7; i++) {
+        const day = new Date(start);
+        day.setDate(start.getDate() + i);
+
+        const key = dateKey(day);
+
+        (events[key] || []).forEach(event => {
+            foundEvents = true;
+
+            const item = document.createElement("li");
+            item.className = "week-event";
+            item.tabIndex = 0;
+
+            const info = document.createElement("div");
+            info.className = "week-event-info";
+
+            const name = document.createElement("p");
+            name.className = "week-event-name";
+            name.textContent = event.name;
+
+            const date = document.createElement("p");
+            date.className = "week-event-date";
+            date.textContent = formatDate(day);
+
+            info.appendChild(name);
+            info.appendChild(date);
+
+            const category = document.createElement("span");
+            category.className = "week-event-category";
+            category.textContent = event.category || "Personal";
+
+            item.appendChild(info);
+            item.appendChild(category);
+
+            function selectEventDate() {
+                selectedDate = new Date(day);
+                updateSelectedDate();
+                renderCalendar();
+                renderTasks();
+                renderEvents();
+                renderWeeklyOverview();
+            }
+
+            item.onclick = selectEventDate;
+
+            item.onkeydown = function(e) {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    selectEventDate();
+                }
+            };
+
+            eventList.appendChild(item);
+        });
+    }
+
+    if (!foundEvents) {
+        const empty = document.createElement("li");
+        empty.className = "week-empty";
+        empty.textContent = "No events planned for this week.";
+        eventList.appendChild(empty);
+    }
+}
+
+
+// GOALS
+
+let goals = loadArray("dayflowGoals");
+
+function saveGoals() {
+    localStorage.setItem("dayflowGoals", JSON.stringify(goals));
+}
+
+function addGoal() {
+    const input = document.getElementById("goalInput");
+    const name = input.value.trim();
+
+    if (name === "") {
+        alert("Please write a goal first!");
+        input.focus();
+        return;
+    }
+
+    const category = document.getElementById("goalCategoryInput").value;
+    const targetDate = document.getElementById("goalDateInput").value;
+
+    goals.push({
+        id: Date.now(),
+        name: name,
+        category: category,
+        targetDate: targetDate,
+        progress: 0
+    });
+
+    saveGoals();
+
+    input.value = "";
+    document.getElementById("goalDateInput").value = "";
+
+    renderGoals();
+    input.focus();
+}
+
+function updateGoalProgress(id, value) {
+    const goal = goals.find(item => item.id === id);
+
+    if (!goal) return;
+
+    goal.progress = Number(value);
+    saveGoals();
+    renderGoals();
+}
+
+function deleteGoal(id) {
+    goals = goals.filter(goal => goal.id !== id);
+    saveGoals();
+    renderGoals();
+}
+
+function renderGoals() {
+    const list = document.getElementById("goalList");
+    const count = goals.length;
+
+    const average = count === 0
+        ? 0
+        : Math.round(
+            goals.reduce((sum, goal) =>
+                sum + Number(goal.progress || 0), 0
+            ) / count
+        );
+
+    document.getElementById("goalCount").textContent =
+        count + (count === 1 ? " goal" : " goals");
+
+    document.getElementById("goalAverage").textContent =
+        average + "% average progress";
+
+    document.getElementById("goalOverallFill").style.width =
+        average + "%";
+
+    document.getElementById("goalOverallTrack").setAttribute(
+        "aria-valuenow",
+        average
+    );
+
+    list.innerHTML = "";
+
+    if (count === 0) {
+        const empty = document.createElement("p");
+        empty.className = "goal-empty";
+        empty.textContent =
+            "No goals yet. Add one small or big goal to get started.";
+        list.appendChild(empty);
+        return;
+    }
+
+    goals.forEach(goal => {
+        const progress = Math.min(
+            100,
+            Math.max(0, Number(goal.progress) || 0)
+        );
+
+        const item = document.createElement("article");
+        item.className = "goal-item";
+
+        const top = document.createElement("div");
+        top.className = "goal-item-top";
+
+        const info = document.createElement("div");
+
+        const title = document.createElement("p");
+        title.className = "goal-title";
+        title.textContent = goal.name;
+
+        const meta = document.createElement("p");
+        meta.className = "goal-meta";
+
+        const targetText = goal.targetDate
+            ? "Target: " + new Date(
+                goal.targetDate + "T12:00:00"
+              ).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+              })
+            : "No target date";
+
+        meta.textContent =
+            (goal.category || "Personal") + " · " + targetText;
+
+        info.appendChild(title);
+        info.appendChild(meta);
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "goal-delete";
+        removeButton.textContent = "×";
+
+        removeButton.onclick = function() {
+            deleteGoal(goal.id);
+        };
+
+        top.appendChild(info);
+        top.appendChild(removeButton);
+
+        const progressRow = document.createElement("div");
+        progressRow.className = "goal-progress-row";
+
+        const progressLabel = document.createElement("label");
+        progressLabel.textContent = "Progress";
+
+        const progressValue = document.createElement("span");
+        progressValue.textContent = progress + "%";
+
+        progressRow.appendChild(progressLabel);
+        progressRow.appendChild(progressValue);
+
+        const track = document.createElement("div");
+        track.className = "goal-progress-track";
+
+        const fill = document.createElement("div");
+        fill.className = "goal-progress-fill";
+        fill.style.width = progress + "%";
+
+        track.appendChild(fill);
+
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "100";
+        slider.step = "5";
+        slider.value = progress;
+        slider.className = "goal-slider";
+        slider.setAttribute("aria-label", "Progress for " + goal.name);
+
+        slider.oninput = function() {
+            const newValue = Number(slider.value);
+            progressValue.textContent = newValue + "%";
+            fill.style.width = newValue + "%";
+
+            goal.progress = newValue;
+            saveGoals();
+
+            const newAverage = Math.round(
+                goals.reduce((sum, item) =>
+                    sum + Number(item.progress || 0), 0
+                ) / goals.length
+            );
+
+            document.getElementById("goalAverage").textContent =
+                newAverage + "% average progress";
+
+            document.getElementById("goalOverallFill").style.width =
+                newAverage + "%";
+
+            document.getElementById("goalOverallTrack").setAttribute(
+                "aria-valuenow",
+                newAverage
+            );
+        };
+
+        item.appendChild(top);
+        item.appendChild(progressRow);
+        item.appendChild(track);
+        item.appendChild(slider);
+
+        list.appendChild(item);
+    });
+}
+
+
+// NOTES & JOURNAL
+
+let journalEntries = loadArray("dayflowNotes");
+
+function saveJournalEntries() {
+    localStorage.setItem(
+        "dayflowNotes",
+        JSON.stringify(journalEntries)
+    );
+}
+
+function addJournalEntry() {
+    const titleInput = document.getElementById("journalTitleInput");
+    const dateInput = document.getElementById("journalDateInput");
+    const contentInput = document.getElementById("journalContentInput");
+
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+    const entryDate = dateInput.value;
+
+    if (title === "") {
+        alert("Please add a title to your note.");
+        titleInput.focus();
+        return;
+    }
+
+    if (content === "") {
+        alert("Please write something in your note.");
+        contentInput.focus();
+        return;
+    }
+
+    if (entryDate === "") {
+        alert("Please choose a date for your note.");
+        dateInput.focus();
+        return;
+    }
+
+    journalEntries.push({
+        id: Date.now(),
+        title: title,
+        date: entryDate,
+        content: content,
+        createdAt: new Date().toISOString()
+    });
+
+    saveJournalEntries();
+
+    titleInput.value = "";
+    contentInput.value = "";
+    dateInput.value = dateKey(new Date());
+
+    renderJournalEntries();
+    titleInput.focus();
+}
+
+function deleteJournalEntry(id) {
+    journalEntries = journalEntries.filter(
+        entry => entry.id !== id
+    );
+
+    saveJournalEntries();
+    renderJournalEntries();
+}
+
+function editJournalEntry(id) {
+    const entry = journalEntries.find(item => item.id === id);
+    if (!entry) return;
+
+    const card = document.getElementById("journal-entry-" + id);
+    if (!card) return;
+
+    card.innerHTML = "";
+
+    const form = document.createElement("div");
+    form.className = "journal-edit-form";
+
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.maxLength = 100;
+    titleInput.value = entry.title;
+
+    const dateInput = document.createElement("input");
+    dateInput.type = "date";
+    dateInput.value = entry.date;
+
+    const contentInput = document.createElement("textarea");
+    contentInput.maxLength = 5000;
+    contentInput.value = entry.content;
+
+    const actions = document.createElement("div");
+    actions.className = "journal-edit-actions";
+
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.textContent = "Save Changes";
+
+    saveButton.onclick = function() {
+        const newTitle = titleInput.value.trim();
+        const newContent = contentInput.value.trim();
+
+        if (!newTitle || !newContent || !dateInput.value) {
+            alert("Please complete the title, date, and note.");
+            return;
+        }
+
+        entry.title = newTitle;
+        entry.date = dateInput.value;
+        entry.content = newContent;
+
+        saveJournalEntries();
+        renderJournalEntries();
+    };
+
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.className = "journal-cancel";
+    cancelButton.textContent = "Cancel";
+    cancelButton.onclick = renderJournalEntries;
+
+    actions.appendChild(saveButton);
+    actions.appendChild(cancelButton);
+
+    form.appendChild(titleInput);
+    form.appendChild(dateInput);
+    form.appendChild(contentInput);
+    form.appendChild(actions);
+
+    card.appendChild(form);
+    titleInput.focus();
+}
+
+function renderJournalEntries() {
+    const list = document.getElementById("journalList");
+    list.innerHTML = "";
+
+    const sortedEntries = [...journalEntries].sort((a, b) => {
+        if (a.date === b.date) {
+            return (b.id || 0) - (a.id || 0);
+        }
+
+        return b.date.localeCompare(a.date);
+    });
+
+    if (sortedEntries.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "journal-empty";
+        empty.textContent =
+            "Your journal is empty. Save your first note above.";
+        list.appendChild(empty);
+        return;
+    }
+
+    sortedEntries.forEach(entry => {
+        const card = document.createElement("article");
+        card.className = "journal-entry";
+        card.id = "journal-entry-" + entry.id;
+
+        const title = document.createElement("h4");
+        title.className = "journal-entry-title";
+        title.textContent = entry.title;
+
+        const date = document.createElement("p");
+        date.className = "journal-entry-date";
+        date.textContent = new Date(
+            entry.date + "T12:00:00"
+        ).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+        const content = document.createElement("p");
+        content.className = "journal-entry-content";
+        content.textContent = entry.content;
+
+        const actions = document.createElement("div");
+        actions.className = "journal-actions";
+
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.textContent = "Edit";
+
+        editButton.onclick = function() {
+            editJournalEntry(entry.id);
+        };
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "journal-delete";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.onclick = function() {
+            deleteJournalEntry(entry.id);
+        };
+
+        actions.appendChild(editButton);
+        actions.appendChild(deleteButton);
+
+        card.appendChild(title);
+        card.appendChild(date);
+        card.appendChild(content);
+        card.appendChild(actions);
+
+        list.appendChild(card);
+    });
+}
+
+
+// FOCUS TIMER
+
+const timerModes = {
+    focus: 25 * 60,
+    break: 5 * 60
+};
+
+let currentTimerMode = "focus";
+let timerRemaining = timerModes.focus;
+let timerInterval = null;
+let timerEndTime = null;
+let timerIsRunning = false;
+
+function formatTimer(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return String(minutes).padStart(2, "0") + ":" +
+           String(remainingSeconds).padStart(2, "0");
+}
+
+function updateTimerDisplay() {
+    document.getElementById("timerDisplay").textContent =
+        formatTimer(timerRemaining);
+}
+
+function setTimerMode(mode) {
+    pauseTimer();
+
+    currentTimerMode = mode;
+    timerRemaining = timerModes[mode];
+
+    document.getElementById("focusMode").classList.toggle(
+        "active", mode === "focus"
+    );
+
+    document.getElementById("breakMode").classList.toggle(
+        "active", mode === "break"
+    );
+
+    document.getElementById("timerStatus").textContent =
+        mode === "focus"
+            ? "Time to focus."
+            : "Take a little break.";
+
+    document.getElementById("startPauseButton").textContent = "Start";
+
+    updateTimerDisplay();
+}
+
+function startPauseTimer() {
+    if (timerIsRunning) {
+        pauseTimer();
+        return;
+    }
+
+    if (timerRemaining <= 0) {
+        timerRemaining = timerModes[currentTimerMode];
+    }
+
+    timerIsRunning = true;
+    timerEndTime = Date.now() + timerRemaining * 1000;
+
+    document.getElementById("startPauseButton").textContent = "Pause";
+
+    document.getElementById("timerStatus").textContent =
+        currentTimerMode === "focus"
+            ? "You're doing great. Keep going!"
+            : "Enjoy your break.";
+
+    timerInterval = setInterval(tickTimer, 250);
+}
+
+function tickTimer() {
+    const millisecondsLeft = timerEndTime - Date.now();
+
+    timerRemaining = Math.max(
+        0,
+        Math.ceil(millisecondsLeft / 1000)
+    );
+
+    updateTimerDisplay();
+
+    if (timerRemaining <= 0) {
+        clearInterval(timerInterval);
+
+        timerInterval = null;
+        timerIsRunning = false;
+        timerRemaining = 0;
+        timerEndTime = null;
+
+        document.getElementById("startPauseButton").textContent = "Start";
+
+        document.getElementById("timerStatus").textContent =
+            currentTimerMode === "focus"
+                ? "Focus session complete. Well done!"
+                : "Break is over. Ready to focus again?";
+
+        updateTimerDisplay();
+    }
+}
+
+function pauseTimer() {
+    if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    if (timerIsRunning && timerEndTime !== null) {
+        timerRemaining = Math.max(
+            0,
+            Math.ceil((timerEndTime - Date.now()) / 1000)
+        );
+    }
+
+    timerIsRunning = false;
+    timerEndTime = null;
+
+    const button = document.getElementById("startPauseButton");
+
+    if (button) {
+        button.textContent = "Start";
+    }
+
+    updateTimerDisplay();
+}
+
+function resetTimer() {
+    pauseTimer();
+
+    timerRemaining = timerModes[currentTimerMode];
+
+    document.getElementById("timerStatus").textContent =
+        currentTimerMode === "focus"
+            ? "Ready when you are."
+            : "Break time is ready.";
+
+    document.getElementById("startPauseButton").textContent = "Start";
+
+    updateTimerDisplay();
+}
+
+
+// INITIALIZE
+
+updateSelectedDate();
+
+document.getElementById("eventDateInput").value =
+    dateKey(new Date());
+
+document.getElementById("journalDateInput").value =
+    dateKey(new Date());
+
+renderCalendar();
+renderTasks();
+renderEvents();
+renderWeeklyOverview();
+renderGoals();
+renderJournalEntries();
+updateTimerDisplay();
+
+refreshNotificationButton();
+checkEventReminders();
+
+setInterval(checkEventReminders, 30000);
+
+</script>
+
+</body>
+</html>
